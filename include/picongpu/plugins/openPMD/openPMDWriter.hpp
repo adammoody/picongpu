@@ -137,7 +137,6 @@ namespace picongpu
                 // avoid deadlock between not finished pmacc tasks and mpi calls in
                 // openPMD
                 __getTransactionEvent().waitForFinished();
-                //SCR_Start_output(fullName, SCR_FLAG_OUTPUT);
                 openPMDSeries = std::make_unique<::openPMD::Series>(
                     fullName,
                     at,
@@ -178,7 +177,6 @@ make sure that environment variable OPENPMD_BP_BACKEND is not set to ADIOS1.
                 log<picLog::INPUT_OUTPUT>("openPMD: close file: %1%") % fileName;
                 openPMDSeries.reset();
                 MPI_Barrier(this->communicator);
-                //SCR_Complete_output(1);
                 log<picLog::INPUT_OUTPUT>("openPMD: successfully closed file: %1%") % fileName;
             }
             else
@@ -900,10 +898,13 @@ make sure that environment variable OPENPMD_BP_BACKEND is not set to ADIOS1.
             void endWrite()
             {
                 mThreadParams.fieldBuffer.resize(0);
+                //SCR_Complete_output(1);
             }
 
             void initWrite()
             {
+                //SCR_Start_output(fullName, SCR_FLAG_OUTPUT);
+
                 // fieldBuffer will only be resized if needed
                 // in some openPMD backends, it's more efficient to let the backend handle buffer creation
                 // (span-based RecordComponent::storeChunk() API)
